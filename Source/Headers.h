@@ -6,6 +6,7 @@
 #include "View.h"
 
 #include "Oscillator.h"
+#include "WavetableOscillator.h"
 #include "SynthesiserVoice.h"
 
 #include "PluginProcessor.h"
