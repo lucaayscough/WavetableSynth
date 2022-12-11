@@ -13,11 +13,21 @@ public:
     void setSampleRate (float sampleRate);
     void setFrequency (float frequency);
     
+    void updateIndexIncrement();
+    
+    float interpolateLinearly();
+    
+    void prepareToPlay (float sampleRate);
+    
     float processSample();
 
 private:
-    float m_sampleRate;
-    float m_frequency;
+    float m_sampleRate = 0.f;
+    float m_frequency = 0.f;
+    
+    int m_wavetableLength = 128;
+    float m_index = 0.f;
+    float m_indexIncrement = 0.f;
     juce::Array<float> m_wavetable;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavetableOscillator)

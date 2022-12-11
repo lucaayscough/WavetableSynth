@@ -57,7 +57,7 @@ void SynthesiserVoice::startNote (int midiNoteNumber, float velocity, juce::Synt
     {
         m_playing = true;
         m_frequency = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
-        m_voice.setPhase (0.f);
+        //m_voice.setPhase (0.f);
         m_voice.setFrequency (m_frequency);
         m_adsr.reset();
         m_adsr.noteOn();

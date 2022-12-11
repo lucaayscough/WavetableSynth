@@ -40,7 +40,7 @@ public:
 private:
     bool m_playing = false;
     
-    SawtoothOscillator m_voice;
+    WavetableOscillator m_voice;
     
     juce::ADSR m_adsr;
     
