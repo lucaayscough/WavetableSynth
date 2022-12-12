@@ -13,7 +13,7 @@ public:
     void setSampleRate (float sampleRate);
     void setFrequency (float frequency);
     void setIndex (float index);
-    void setWavetable (juce::AudioFormatReader* audioFormatReader);
+    void setWavetable (juce::AudioFormatReader* audioFormatReader, float position);
     
     void updateIndexIncrement();
     
@@ -27,7 +27,7 @@ private:
     float m_sampleRate = 0.f;
     float m_frequency = 0.f;
     
-    int m_wavetableLength = 128;
+    int m_wavetableLength = 256;
     float m_index = 0.f;
     float m_indexIncrement = 0.f;
     juce::AudioBuffer<float> m_wavetable;

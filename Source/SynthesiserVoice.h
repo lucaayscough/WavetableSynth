@@ -23,7 +23,7 @@ public:
     
     void setPitchBend (int pitchWheelValue);
     void setEnvelope (float attack, float decay, float sustain, float release);
-    void setWavetable (juce::AudioFormatReader* audioFormatReader);
+    void setWavetable (juce::AudioFormatReader* audioFormatReader, float position);
     
     bool canPlaySound (juce::SynthesiserSound* sound) override;
     void startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override;

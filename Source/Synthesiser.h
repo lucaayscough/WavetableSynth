@@ -7,7 +7,7 @@ public:
     Synthesiser();
     ~Synthesiser();
     
-    void setWavetable();
+    void setWavetable (float position);
     
 private:
     juce::AudioFormatManager m_formatManager;

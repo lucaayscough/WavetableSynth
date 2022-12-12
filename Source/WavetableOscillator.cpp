@@ -19,15 +19,18 @@ void WavetableOscillator::setFrequency (float frequency)
 
 void WavetableOscillator::setIndex (float index)                        { m_index = index; }
 
-void WavetableOscillator::setWavetable (juce::AudioFormatReader *audioFormatReader)
+void WavetableOscillator::setWavetable (juce::AudioFormatReader *audioFormatReader, float position)
 {
     m_wavetable.clear();
-    audioFormatReader->read (&m_wavetable, 0, m_wavetableLength, 0, true, false);
+    audioFormatReader->read (&m_wavetable, 0, m_wavetableLength, static_cast<int> (audioFormatReader->lengthInSamples * position), true, false);
+    
+    auto peakValue = m_wavetable.getMagnitude (0, 0, m_wavetableLength);
+    m_wavetable.applyGain (1.f / peakValue);
 }
 
 void WavetableOscillator::updateIndexIncrement()
 {
-    m_indexIncrement = m_frequency * static_cast<float>(m_wavetableLength) / static_cast<float>(m_sampleRate);
+    m_indexIncrement = m_frequency * static_cast<float> (m_wavetableLength) / static_cast<float> (m_sampleRate);
 }
 
 float WavetableOscillator::interpolateLinearly()

@@ -14,6 +14,8 @@ WavetableSynth::WavetableSynth()
                        ),
 #endif
         m_apvts (*this, nullptr, "Parameters", {
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"wavetablePos", 1}, "Wavetable Position", 0.f, 1.f, 0.f),
+            
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"attack", 1}, "Attack", 0.1f, 4.f, 0.1f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"decay", 1}, "Decay", 0.1f, 4.f, 0.1f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"sustain", 1}, "Sustain", 0.1f, 1.f, 0.5f),
@@ -32,6 +34,8 @@ WavetableSynth::WavetableSynth()
     }
     
     // Plugin parameters.
+    m_wavetablePos = m_apvts.getRawParameterValue ("wavetablePos");
+    
     m_attack = m_apvts.getRawParameterValue ("attack");
     m_decay = m_apvts.getRawParameterValue ("decay");
     m_sustain = m_apvts.getRawParameterValue ("sustain");
@@ -92,20 +96,18 @@ void WavetableSynth::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     m_synthesiser.setCurrentPlaybackSampleRate (sampleRate);
     
-    m_smoothAttack.reset (sampleRate, 0.0001);
-    m_smoothDecay.reset (sampleRate, 0.0001);
-    m_smoothSustain.reset (sampleRate, 0.0001);
-    m_smoothRelease.reset (sampleRate, 0.0001);
+    m_smoothAttack.reset (sampleRate, 0.001);
+    m_smoothDecay.reset (sampleRate, 0.001);
+    m_smoothSustain.reset (sampleRate, 0.001);
+    m_smoothRelease.reset (sampleRate, 0.001);
     
-    m_smoothFilterCutoff.reset (sampleRate, 0.01);
-    m_smoothOutputGain.reset (sampleRate, 0.0001);
+    m_smoothFilterCutoff.reset (sampleRate, 0.001);
+    m_smoothOutputGain.reset (sampleRate, 0.001);
     
     for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
     {
         m_filters.add (new juce::IIRFilter);
     }
-    
-    m_synthesiser.setWavetable();
 }
 
 void WavetableSynth::releaseResources() {}
@@ -141,6 +143,9 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     juce::ScopedNoDenormals noDenormals;
     
     buffer.clear();
+    
+    // Wavetable.
+    m_synthesiser.setWavetable (*m_wavetablePos);
     
     // ADSR.
     m_smoothAttack.setTargetValue (*m_attack);

@@ -47,9 +47,9 @@ void SynthesiserVoice::setEnvelope (float attack, float decay, float sustain, fl
     m_adsr.setParameters (parameters);
 }
 
-void SynthesiserVoice::setWavetable (juce::AudioFormatReader *audioFormatReader)
+void SynthesiserVoice::setWavetable (juce::AudioFormatReader *audioFormatReader, float position)
 {
-    m_voice.setWavetable (audioFormatReader);
+    m_voice.setWavetable (audioFormatReader, position);
 }
 
 bool SynthesiserVoice::canPlaySound (juce::SynthesiserSound* sound) {
@@ -61,9 +61,10 @@ void SynthesiserVoice::startNote (int midiNoteNumber, float velocity, juce::Synt
     if (!m_playing)
     {
         m_playing = true;
+        m_frequency = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
         
         m_voice.setIndex (0.f);
-        m_voice.setFrequency (juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber));
+        m_voice.setFrequency (m_frequency);
         
         m_adsr.reset();
         m_adsr.noteOn();
@@ -133,6 +134,10 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
         
         if (m_velocity != 1.f)
         {
+            // TODO:
+            // sort this...
+            
+            
             //block.applyGain (m_velocity);
         }
         
