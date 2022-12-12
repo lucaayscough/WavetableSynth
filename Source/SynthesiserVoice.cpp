@@ -61,15 +61,13 @@ void SynthesiserVoice::startNote (int midiNoteNumber, float velocity, juce::Synt
     if (!m_playing)
     {
         m_playing = true;
-        m_frequency = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
         
-        // TODO:
-        // Fix this.
-    
-        //m_voice.setPhase (0.f);
-        m_voice.setFrequency (m_frequency);
+        m_voice.setIndex (0.f);
+        m_voice.setFrequency (juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber));
+        
         m_adsr.reset();
         m_adsr.noteOn();
+        
         m_velocity = velocity;
         setPitchBend (currentPitchWheelPosition);
     }

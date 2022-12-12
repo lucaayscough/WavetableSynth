@@ -2,16 +2,7 @@
 
 
 WavetableOscillator::WavetableOscillator()
-    :   m_wavetable (1, m_wavetableLength)
-{
-    m_wavetable.clear();
-    auto* wavetableData = m_wavetable.getWritePointer (0);
-    
-    for (int i = 0; i < m_wavetableLength; ++i)
-    {
-        wavetableData[i] =  std::sinf(2.f * M_PI * static_cast<float> (i) / m_wavetableLength);
-    }
-}
+    :   m_wavetable (1, m_wavetableLength) {}
 
 WavetableOscillator::~WavetableOscillator() {}
 
@@ -25,6 +16,8 @@ void WavetableOscillator::setFrequency (float frequency)
     m_frequency = frequency;
     updateIndexIncrement();
 }
+
+void WavetableOscillator::setIndex (float index)                        { m_index = index; }
 
 void WavetableOscillator::setWavetable (juce::AudioFormatReader *audioFormatReader)
 {

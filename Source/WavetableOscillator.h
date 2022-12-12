@@ -12,6 +12,7 @@ public:
     
     void setSampleRate (float sampleRate);
     void setFrequency (float frequency);
+    void setIndex (float index);
     void setWavetable (juce::AudioFormatReader* audioFormatReader);
     
     void updateIndexIncrement();
