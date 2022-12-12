@@ -5,7 +5,13 @@
               companyWebsite="lucaayscough.com" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturer="AdversarialAudio">
   <MAINGROUP id="ojil4F" name="WavetableSynth">
+    <GROUP id="{8B175B35-070C-A0A0-AAE0-A134BC286903}" name="Resources">
+      <FILE id="i3IKPg" name="ESW Analog - 303 Saw.wav" compile="0" resource="1"
+            file="Resources/ESW Analog - 303 Saw.wav"/>
+    </GROUP>
     <GROUP id="{0C0C00B0-646B-17EE-DAC8-4674BD845827}" name="Source">
+      <FILE id="I9NcAC" name="Synthesiser.cpp" compile="1" resource="0" file="Source/Synthesiser.cpp"/>
+      <FILE id="eA3wA1" name="Synthesiser.h" compile="0" resource="0" file="Source/Synthesiser.h"/>
       <FILE id="oksRla" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="iLgXCA" name="PluginProcessor.h" compile="0" resource="0"

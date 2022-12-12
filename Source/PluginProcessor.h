@@ -40,7 +40,7 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState m_apvts;
-    juce::Synthesiser m_synthesiser;
+    Synthesiser m_synthesiser;
     const int m_numVoices = 16;
     
     // Filter.

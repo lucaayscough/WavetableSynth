@@ -47,6 +47,11 @@ void SynthesiserVoice::setEnvelope (float attack, float decay, float sustain, fl
     m_adsr.setParameters (parameters);
 }
 
+void SynthesiserVoice::setWavetable (juce::AudioFormatReader *audioFormatReader)
+{
+    m_voice.setWavetable (audioFormatReader);
+}
+
 bool SynthesiserVoice::canPlaySound (juce::SynthesiserSound* sound) {
     return dynamic_cast<SynthesiserSound*> (sound) != nullptr;
 }
@@ -57,6 +62,10 @@ void SynthesiserVoice::startNote (int midiNoteNumber, float velocity, juce::Synt
     {
         m_playing = true;
         m_frequency = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
+        
+        // TODO:
+        // Fix this.
+    
         //m_voice.setPhase (0.f);
         m_voice.setFrequency (m_frequency);
         m_adsr.reset();

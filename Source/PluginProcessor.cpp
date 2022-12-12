@@ -104,6 +104,8 @@ void WavetableSynth::prepareToPlay (double sampleRate, int samplesPerBlock)
     {
         m_filters.add (new juce::IIRFilter);
     }
+    
+    m_synthesiser.setWavetable();
 }
 
 void WavetableSynth::releaseResources() {}
@@ -148,7 +150,7 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     
     for (int voice = 0; voice < m_numVoices; ++voice)
     {
-        SynthesiserVoice* v = dynamic_cast<SynthesiserVoice*>(m_synthesiser.getVoice (voice));
+        SynthesiserVoice* v = dynamic_cast<SynthesiserVoice*> (m_synthesiser.getVoice (voice));
         v->setEnvelope (m_smoothAttack.getNextValue(), m_smoothDecay.getNextValue(), m_smoothSustain.getNextValue(), m_smoothRelease.getNextValue());
     }
     
