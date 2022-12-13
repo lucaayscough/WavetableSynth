@@ -15,7 +15,9 @@ WavetableSynth::WavetableSynth()
 #endif
         m_apvts (*this, nullptr, "Parameters", {
             // Wavetable.
-            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"wavetablePosition", 1}, "Wavetable Position", juce::NormalisableRange<float> (0, 255, 1), 1),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"wavetablePosition", 1}, "Wavetable Position", juce::NormalisableRange<float> (0, 255, 1), 0),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"numActiveVoices", 1}, "Num Active Voices", juce::NormalisableRange<float> (1, 16, 1), 1),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"detune", 1}, "Detune", 0.01f, 1.f, 0.f),
             
             // ADSR.
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"attack", 1}, "Attack", 0.01f, 4.f, 0.1f),
@@ -46,6 +48,8 @@ WavetableSynth::WavetableSynth()
     
     // Plugin parameters.
     m_wavetablePosition = m_apvts.getRawParameterValue ("wavetablePosition");
+    m_numActiveVoices = m_apvts.getRawParameterValue ("numActiveVoices");
+    m_detune = m_apvts.getRawParameterValue ("detune");
     
     m_attack = m_apvts.getRawParameterValue ("attack");
     m_decay = m_apvts.getRawParameterValue ("decay");
@@ -137,7 +141,6 @@ void WavetableSynth::prepareToPlay (double sampleRate, int samplesPerBlock)
     m_smoothOutputGain.reset (sampleRate, Variables::parameterSmoothingTime);
     m_smoothOutputGain.setCurrentAndTargetValue (*m_outputGain);
     
-    
     // Prepare filters.
     m_filters.clear();
     
@@ -200,6 +203,8 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     {
         SynthesiserVoice* v = dynamic_cast<SynthesiserVoice*> (m_synthesiser.getVoice (voice));
         v->setEnvelope (m_smoothAttack.getNextValue(), m_smoothDecay.getNextValue(), m_smoothSustain.getNextValue(), m_smoothRelease.getNextValue());
+        v->setNumActiveVoices (*m_numActiveVoices);
+        v->setDetune (*m_detune);
     }
     
     // Render audio.

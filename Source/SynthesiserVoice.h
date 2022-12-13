@@ -21,6 +21,8 @@ public:
     SynthesiserVoice();
     ~SynthesiserVoice();
     
+    void setNumActiveVoices (int numActiveVoices);
+    void setDetune (float detune);
     void setPitchBend (int pitchWheelValue);
     void setEnvelope (float attack, float decay, float sustain, float release);
     void setWavetablePosition (float position);
@@ -34,21 +36,20 @@ public:
     void setCurrentPlaybackSampleRate (double newRate) override;
 
     void modulateFrequency (float modulationAmount);
-    void pitchBendModulation();
     float getDetuneAmount (int voice);
+    float getPitchBendModulation();
     
     void renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
     
 private:
     bool m_playing = false;
     
-    //WavetableOscillator m_voice;
     juce::OwnedArray<WavetableOscillator> m_voices;
-    const int m_numVoices = 16;
-    int m_numActiveVoices = 4;
+    int m_numActiveVoices;
     
     juce::ADSR m_adsr;
     
+    float m_detune;
     float m_velocity;
     float m_pitchBend;
     

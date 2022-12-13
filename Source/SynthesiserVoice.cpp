@@ -11,7 +11,7 @@ bool SynthesiserSound::appliesToChannel (int midiChannel) { return true; }
 SynthesiserVoice::SynthesiserVoice()
 {
     // Oscillators.
-    for (int voice = 0; voice < m_numVoices; ++voice)
+    for (int voice = 0; voice < Variables::numVoices; ++voice)
     {
         m_voices.add (new WavetableOscillator);
     }
@@ -28,6 +28,9 @@ SynthesiserVoice::SynthesiserVoice()
 }
 
 SynthesiserVoice::~SynthesiserVoice() {}
+
+void SynthesiserVoice::setNumActiveVoices(int numActiveVoices)          { m_numActiveVoices = numActiveVoices; }
+void SynthesiserVoice::setDetune(float detune)                          { m_detune = detune; }
 
 void SynthesiserVoice::setPitchBend (int pitchWheelValue)
 {
@@ -56,7 +59,7 @@ void SynthesiserVoice::setEnvelope (float attack, float decay, float sustain, fl
 
 void SynthesiserVoice::setWavetablePosition (float position)
 {
-    for (int voice = 0; voice < m_numActiveVoices; ++voice)
+    for (int voice = 0; voice < Variables::numVoices; ++voice)
     {
         m_voices[voice]->setFrame (position);
     }
@@ -73,7 +76,7 @@ void SynthesiserVoice::startNote (int midiNoteNumber, float velocity, juce::Synt
         m_playing = true;
         m_frequency = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
         
-        for (int voice = 0; voice < m_numActiveVoices; ++voice)
+        for (int voice = 0; voice < Variables::numVoices; ++voice)
         {
             m_voices[voice]->setIndex (0.f);
             m_voices[voice]->setFrequency (m_frequency * getDetuneAmount (voice));
@@ -103,7 +106,7 @@ void SynthesiserVoice::setCurrentPlaybackSampleRate (double newRate)
 {
     if (newRate != 0)
     {
-        for (int voice = 0; voice < m_numActiveVoices; ++voice)
+        for (int voice = 0; voice < Variables::numVoices; ++voice)
         {
             m_voices[voice]->setSampleRate (newRate);
         }
@@ -120,24 +123,11 @@ void SynthesiserVoice::setCurrentPlaybackSampleRate (double newRate)
     }
 }
 
-void SynthesiserVoice::modulateFrequency (float modulationAmount)
+void SynthesiserVoice::modulateFrequency (float modulationAmount = 1.f)
 {
-    for (int voice = 0; voice < m_numActiveVoices; ++voice)
+    for (int voice = 0; voice < Variables::numVoices; ++voice)
     {
-        m_voices[voice]->setFrequency (m_frequency * modulationAmount * getDetuneAmount (voice));
-    }
-}
-
-void SynthesiserVoice::pitchBendModulation()
-{
-    if (m_pitchBend > 0.f)
-    {
-        modulateFrequency (m_pitchBend + 1.f);
-    }
-    
-    else
-    {
-        modulateFrequency (1.f / -(m_pitchBend - 1.f));
+        m_voices[voice]->setFrequency (m_frequency * modulationAmount * getDetuneAmount(voice));
     }
 }
 
@@ -147,10 +137,27 @@ float SynthesiserVoice::getDetuneAmount (int voice)
     
     if (voice != 0)
     {
-        detune = (static_cast<float> (voice + 1) / static_cast<float> (m_numVoices * 16)) + 1.f;
+        detune = (static_cast<float> (voice + 1) / static_cast<float> (Variables::numVoices * Variables::numVoices)) * m_detune + 1.f;
     }
     
     return detune;
+}
+    
+float SynthesiserVoice::getPitchBendModulation()
+{
+    float bendAmount = 0.f;
+    
+    if (m_pitchBend > 0.f)
+    {
+        bendAmount = m_pitchBend + 1.f;
+    }
+    
+    else
+    {
+        bendAmount = 1.f / -(m_pitchBend - 1.f);
+    }
+    
+    return bendAmount;
 }
 
 void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
@@ -168,11 +175,16 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
         // Modulate in case of pitch bend action.
         if (m_pitchBend != 0.f || m_frequency != m_voices[0]->getFrequency())
         {
-            pitchBendModulation();
+            modulateFrequency (getPitchBendModulation());
+        }
+        
+        else
+        {
+            modulateFrequency ();
         }
         
         // Increase sample rate to remove aliasing.
-        for (int voice = 0; voice < m_numActiveVoices; ++voice)
+        for (int voice = 0; voice < Variables::numVoices; ++voice)
         {
             m_voices[voice]->setSampleRate (m_voices[voice]->getSampleRate() * static_cast<float> (Variables::resampleCoefficient));
         }
@@ -199,7 +211,7 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
         }
         
         // Reset to original sample rate.
-        for (int voice = 0; voice < m_numActiveVoices; ++voice)
+        for (int voice = 0; voice < Variables::numVoices; ++voice)
         {
             m_voices[voice]->setSampleRate (m_voices[voice]->getSampleRate() / static_cast<float> (Variables::resampleCoefficient));
         }

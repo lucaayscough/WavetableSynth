@@ -49,6 +49,8 @@ private:
     
     // Global parameters.
     std::atomic<float>* m_wavetablePosition;
+    std::atomic<float>* m_numActiveVoices;
+    std::atomic<float>* m_detune;
     juce::SmoothedValue<float> m_smoothWavetablePosition;
     
     std::atomic<float>* m_attack;
