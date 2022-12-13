@@ -15,8 +15,6 @@
       <FILE id="kFguPk" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="FWcf0Z" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="I2ki8k" name="View.cpp" compile="1" resource="0" file="Source/View.cpp"/>
-      <FILE id="GEbtxZ" name="View.h" compile="0" resource="0" file="Source/View.h"/>
       <FILE id="SVPByL" name="Headers.h" compile="0" resource="0" file="Source/Headers.h"/>
       <FILE id="A4JMLo" name="Oscillator.cpp" compile="1" resource="0" file="Source/Oscillator.cpp"/>
       <FILE id="pi7HXG" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>

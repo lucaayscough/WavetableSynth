@@ -12,7 +12,6 @@ public:
 
 private:
     WavetableSynth& audioProcessor;
-    View m_view;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavetableSynthEditor)
 };

@@ -222,7 +222,8 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     auto* leftChannel = buffer.getWritePointer (0);
     auto* rightChannel = buffer.getWritePointer (1);
     
-    juce::Reverb::Parameters reverbParameters;
+    auto reverbParameters = m_reverb.getParameters();
+    
     reverbParameters.dryLevel = *m_reverbDryLevel;
     reverbParameters.wetLevel = *m_reverbWetLevel;
     reverbParameters.roomSize = *m_reverbRoomSize;

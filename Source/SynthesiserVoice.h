@@ -35,13 +35,17 @@ public:
 
     void modulateFrequency (float modulationAmount);
     void pitchBendModulation();
+    float getDetuneAmount (int voice);
     
     void renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
     
 private:
     bool m_playing = false;
     
-    WavetableOscillator m_voice;
+    //WavetableOscillator m_voice;
+    juce::OwnedArray<WavetableOscillator> m_voices;
+    const int m_numVoices = 16;
+    int m_numActiveVoices = 4;
     
     juce::ADSR m_adsr;
     
