@@ -14,15 +14,26 @@ WavetableSynth::WavetableSynth()
                        ),
 #endif
         m_apvts (*this, nullptr, "Parameters", {
+            // Wavetable.
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"wavetablePosition", 1}, "Wavetable Position", juce::NormalisableRange<float> (0, 255, 1), 1),
             
+            // ADSR.
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"attack", 1}, "Attack", 0.01f, 4.f, 0.1f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"decay", 1}, "Decay", 0.1f, 4.f, 0.1f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"sustain", 1}, "Sustain", 0.f, 1.f, 0.5f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"release", 1}, "Release", 0.1f, 4.f, 0.1f),
             
+            // Filter.
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"filterCutoff", 1}, "Filter Cutoff", juce::NormalisableRange<float> (20.f, 20000.f, 1.f, 0.2f), 20000.f),
-            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"outputGain", 1}, "Output Gain", 0.f, 1.f, 0.5f)
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"outputGain", 1}, "Output Gain", 0.f, 1.f, 0.5f),
+        
+            // Reverb.
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"reverbDryLevel", 1}, "Reverb Dry Level", 0.f, 1.f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"reverbWetLevel", 1}, "Reverb Wet Level", 0.f, 1.f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"reverbRoomSize", 1}, "Reverb Room Size", 0.f, 1.f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"reverbWidth", 1}, "Reverb Width", 0.f, 1.f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"reverbDamping", 1}, "Reverb Damping", 0.f, 1.f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"reverbFreezeMode", 1}, "Reverb Freeze Mode", 0.f, 1.f, 0.5f)
         })
 {
     // Init synth.
@@ -43,6 +54,13 @@ WavetableSynth::WavetableSynth()
     
     m_filterCutoff = m_apvts.getRawParameterValue ("filterCutoff");
     m_outputGain = m_apvts.getRawParameterValue ("outputGain");
+    
+    m_reverbDryLevel = m_apvts.getRawParameterValue ("reverbDryLevel");
+    m_reverbWetLevel = m_apvts.getRawParameterValue ("reverbWetLevel");
+    m_reverbRoomSize = m_apvts.getRawParameterValue ("reverbRoomSize");
+    m_reverbWidth = m_apvts.getRawParameterValue ("reverbWidth");
+    m_reverbDamping = m_apvts.getRawParameterValue ("reverbDamping");
+    m_reverbFreezeMode = m_apvts.getRawParameterValue ("reverbFreezeMode");
 }
 
 WavetableSynth::~WavetableSynth() {}
@@ -126,7 +144,12 @@ void WavetableSynth::prepareToPlay (double sampleRate, int samplesPerBlock)
     for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
     {
         m_filters.add (new juce::IIRFilter);
+        m_filters[channel]->reset();
     }
+    
+    // Prepare reverb.
+    m_reverb.setSampleRate (sampleRate);
+    m_reverb.reset();
 }
 
 void WavetableSynth::releaseResources() {}
@@ -194,6 +217,22 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
             channelData[sample] = m_filters[channel]->processSingleSampleRaw (channelData[sample]);
         }
     }
+    
+    // Reverb.
+    auto* leftChannel = buffer.getWritePointer (0);
+    auto* rightChannel = buffer.getWritePointer (1);
+    
+    juce::Reverb::Parameters reverbParameters;
+    reverbParameters.dryLevel = *m_reverbDryLevel;
+    reverbParameters.wetLevel = *m_reverbWetLevel;
+    reverbParameters.roomSize = *m_reverbRoomSize;
+    reverbParameters.width = *m_reverbWidth;
+    reverbParameters.damping = *m_reverbDamping;
+    reverbParameters.freezeMode = *m_reverbFreezeMode;
+    
+    m_reverb.setParameters (reverbParameters);
+    
+    m_reverb.processStereo (leftChannel, rightChannel, buffer.getNumSamples());
 
     // Gain.
     m_smoothOutputGain.setTargetValue (*m_outputGain);

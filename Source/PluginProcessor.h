@@ -43,8 +43,9 @@ private:
     Synthesiser m_synthesiser;
     const int m_numVoices = 16;
     
-    // Filter.
+    // DSP.
     juce::OwnedArray<juce::IIRFilter> m_filters;
+    juce::Reverb m_reverb;
     
     // Global parameters.
     std::atomic<float>* m_wavetablePosition;
@@ -62,9 +63,15 @@ private:
     std::atomic<float>* m_filterCutoff;
     juce::SmoothedValue<float> m_smoothFilterCutoff;
     
+    std::atomic<float>* m_reverbDryLevel;
+    std::atomic<float>* m_reverbWetLevel;
+    std::atomic<float>* m_reverbRoomSize;
+    std::atomic<float>* m_reverbWidth;
+    std::atomic<float>* m_reverbDamping;
+    std::atomic<float>* m_reverbFreezeMode;
+    
     std::atomic<float>* m_outputGain;
     juce::SmoothedValue<float> m_smoothOutputGain;
-    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavetableSynth)
 };
