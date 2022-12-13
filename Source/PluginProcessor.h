@@ -47,7 +47,8 @@ private:
     juce::OwnedArray<juce::IIRFilter> m_filters;
     
     // Global parameters.
-    std::atomic<float>* m_wavetablePos;
+    std::atomic<float>* m_wavetablePosition;
+    juce::SmoothedValue<float> m_smoothWavetablePosition;
     
     std::atomic<float>* m_attack;
     std::atomic<float>* m_decay;

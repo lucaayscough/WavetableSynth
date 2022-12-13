@@ -7,10 +7,9 @@ public:
     Synthesiser();
     ~Synthesiser();
     
-    void setWavetable (float position);
+    void setWavetablePosition (float position);
     
 private:
-    juce::AudioFormatManager m_formatManager;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Synthesiser)
 };

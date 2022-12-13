@@ -14,11 +14,11 @@ WavetableSynth::WavetableSynth()
                        ),
 #endif
         m_apvts (*this, nullptr, "Parameters", {
-            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"wavetablePos", 1}, "Wavetable Position", 0.f, 1.f, 0.f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"wavetablePosition", 1}, "Wavetable Position", juce::NormalisableRange<float> (0, 255, 1), 1),
             
-            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"attack", 1}, "Attack", 0.1f, 4.f, 0.1f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"attack", 1}, "Attack", 0.01f, 4.f, 0.1f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"decay", 1}, "Decay", 0.1f, 4.f, 0.1f),
-            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"sustain", 1}, "Sustain", 0.1f, 1.f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"sustain", 1}, "Sustain", 0.f, 1.f, 0.5f),
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"release", 1}, "Release", 0.1f, 4.f, 0.1f),
             
             std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"filterCutoff", 1}, "Filter Cutoff", juce::NormalisableRange<float> (20.f, 20000.f, 1.f, 0.2f), 20000.f),
@@ -34,7 +34,7 @@ WavetableSynth::WavetableSynth()
     }
     
     // Plugin parameters.
-    m_wavetablePos = m_apvts.getRawParameterValue ("wavetablePos");
+    m_wavetablePosition = m_apvts.getRawParameterValue ("wavetablePosition");
     
     m_attack = m_apvts.getRawParameterValue ("attack");
     m_decay = m_apvts.getRawParameterValue ("decay");
@@ -94,16 +94,33 @@ void WavetableSynth::changeProgramName (int index, const juce::String& newName) 
 //==============================================================================
 void WavetableSynth::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    // Prepare synth.
     m_synthesiser.setCurrentPlaybackSampleRate (sampleRate);
     
-    m_smoothAttack.reset (sampleRate, 0.001);
-    m_smoothDecay.reset (sampleRate, 0.001);
-    m_smoothSustain.reset (sampleRate, 0.001);
-    m_smoothRelease.reset (sampleRate, 0.001);
+    // Prepare parameter smoothing.
+    m_smoothWavetablePosition.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothWavetablePosition.setCurrentAndTargetValue (*m_wavetablePosition);
     
-    m_smoothFilterCutoff.reset (sampleRate, 0.001);
-    m_smoothOutputGain.reset (sampleRate, 0.001);
+    m_smoothAttack.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothAttack.setCurrentAndTargetValue (*m_attack);
     
+    m_smoothDecay.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothDecay.setCurrentAndTargetValue (*m_decay);
+    
+    m_smoothSustain.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothSustain.setCurrentAndTargetValue (*m_sustain);
+    
+    m_smoothRelease.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothRelease.setCurrentAndTargetValue (*m_release);
+    
+    m_smoothFilterCutoff.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothFilterCutoff.setCurrentAndTargetValue (*m_filterCutoff);
+    
+    m_smoothOutputGain.reset (sampleRate, Variables::parameterSmoothingTime);
+    m_smoothOutputGain.setCurrentAndTargetValue (*m_outputGain);
+    
+    
+    // Prepare filters.
     for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
     {
         m_filters.add (new juce::IIRFilter);
@@ -145,7 +162,8 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     buffer.clear();
     
     // Wavetable.
-    m_synthesiser.setWavetable (*m_wavetablePos);
+    m_smoothWavetablePosition.setTargetValue (*m_wavetablePosition);
+    m_synthesiser.setWavetablePosition (m_smoothWavetablePosition.getNextValue());
     
     // ADSR.
     m_smoothAttack.setTargetValue (*m_attack);

@@ -47,9 +47,9 @@ void SynthesiserVoice::setEnvelope (float attack, float decay, float sustain, fl
     m_adsr.setParameters (parameters);
 }
 
-void SynthesiserVoice::setWavetable (juce::AudioFormatReader *audioFormatReader, float position)
+void SynthesiserVoice::setWavetablePosition (float position)
 {
-    m_voice.setWavetable (audioFormatReader, position);
+    m_voice.setFrame (position);
 }
 
 bool SynthesiserVoice::canPlaySound (juce::SynthesiserSound* sound) {

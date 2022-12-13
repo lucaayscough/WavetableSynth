@@ -13,7 +13,7 @@ public:
     void setSampleRate (float sampleRate);
     void setFrequency (float frequency);
     void setIndex (float index);
-    void setWavetable (juce::AudioFormatReader* audioFormatReader, float position);
+    void setFrame (float frame);
     
     void updateIndexIncrement();
     
@@ -27,10 +27,15 @@ private:
     float m_sampleRate = 0.f;
     float m_frequency = 0.f;
     
-    int m_wavetableLength = 256;
+    static const int m_wavetableLength = 2048;
+    static const int m_numFrames = 256;
+    
+    float m_wavetable[m_wavetableLength][m_numFrames];
+    
     float m_index = 0.f;
     float m_indexIncrement = 0.f;
-    juce::AudioBuffer<float> m_wavetable;
+    
+    int m_frame = 0;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavetableOscillator)
 };
