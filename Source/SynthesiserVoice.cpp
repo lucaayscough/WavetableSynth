@@ -125,15 +125,15 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
 {
     if (m_playing)
     {
-        juce::AudioBuffer<float> blockUpsample (1, numSamples * static_cast<float> (Variables::resampleCoefficient));
         juce::AudioBuffer<float> block (1, numSamples);
-        blockUpsample.clear();
+        juce::AudioBuffer<float> blockUpsample (1, numSamples * static_cast<float> (Variables::resampleCoefficient));
         block.clear();
+        blockUpsample.clear();
         
         auto* blockUpsampleData = blockUpsample.getWritePointer (0);
         auto* blockData = block.getWritePointer (0);
-        
-        
+
+        // Modulate in case of pitch bend action.
         if (m_pitchBend != 0.f || m_frequency != m_voice.getFrequency())
         {
             pitchBendModulation();
@@ -162,16 +162,19 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
         // Reset to original sample rate.
         m_voice.setSampleRate (m_voice.getSampleRate() / static_cast<float> (Variables::resampleCoefficient));
         
+        // Apply gain based on velocity.
         if (m_velocity != 1.f)
         {
             block.applyGain (m_velocity);
         }
         
+        // Move audio data to output buffer.
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
         {
             outputBuffer.addFrom (channel, startSample, block, 0, 0, numSamples);
         }
         
+        // Check if note is playing.
         if (!m_adsr.isActive())
         {
             clearCurrentNote();
