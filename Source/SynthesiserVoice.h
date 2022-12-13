@@ -50,5 +50,7 @@ private:
     
     float m_frequency;
     
+    juce::OwnedArray<juce::IIRFilter> m_filters;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthesiserVoice)
 };

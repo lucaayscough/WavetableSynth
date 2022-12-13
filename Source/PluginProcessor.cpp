@@ -121,6 +121,8 @@ void WavetableSynth::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     
     // Prepare filters.
+    m_filters.clear();
+    
     for (int channel = 0; channel < getTotalNumOutputChannels(); ++channel)
     {
         m_filters.add (new juce::IIRFilter);

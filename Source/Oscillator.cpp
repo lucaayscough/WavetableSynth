@@ -7,12 +7,7 @@
 Oscillator::Oscillator() {}
 Oscillator::~Oscillator() {}
 
-void Oscillator::setFrequency (float frequency)
-{
-    m_frequency = frequency;
-    updatePhaseDelta();
-}
-
+void Oscillator::setFrequency (float frequency)                     { m_frequency = frequency; }
 void Oscillator::setSampleRate (float sampleRate)                   { m_sampleRate = sampleRate; }
 void Oscillator::setBlockSize (int blockSize)                       { m_blockSize = blockSize; }
 void Oscillator::setPhase (float phase)                             { m_phase = phase; }
@@ -95,6 +90,8 @@ void Oscillator::processBlock(juce::AudioBuffer<float>& block)
 
 void Oscillator::processBlock(juce::AudioBuffer<float>& block, int startSample, int numSamples)
 {
+    updatePhaseDelta();
+    
     for (int sample = startSample; sample < startSample + numSamples; ++sample)
     {
         for (int channel = 0; channel < block.getNumChannels(); ++channel)

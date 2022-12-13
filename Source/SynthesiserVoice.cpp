@@ -92,6 +92,14 @@ void SynthesiserVoice::setCurrentPlaybackSampleRate (double newRate)
     {
         m_voice.setSampleRate (newRate);
         m_adsr.setSampleRate (newRate);
+        
+        m_filters.clear();
+        
+        for (int filter = 0; filter < Variables::numResampleFilters; ++filter)
+        {
+            m_filters.add (new juce::IIRFilter);
+            m_filters[filter]->setCoefficients (juce::IIRCoefficients::makeLowPass(newRate * static_cast<double> (Variables::resampleCoefficient), 20000.0));
+        }
     }
 }
 
@@ -117,28 +125,46 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
 {
     if (m_playing)
     {
+        juce::AudioBuffer<float> blockUpsample (1, numSamples * static_cast<float> (Variables::resampleCoefficient));
         juce::AudioBuffer<float> block (1, numSamples);
+        blockUpsample.clear();
         block.clear();
         
+        auto* blockUpsampleData = blockUpsample.getWritePointer (0);
         auto* blockData = block.getWritePointer (0);
+        
         
         if (m_pitchBend != 0.f || m_frequency != m_voice.getFrequency())
         {
             pitchBendModulation();
         }
         
+        // Increase sample rate to remove aliasing.
+        m_voice.setSampleRate (m_voice.getSampleRate() * static_cast<float> (Variables::resampleCoefficient));
+        
+        for (int sample = 0; sample < blockUpsample.getNumSamples(); ++sample)
+        {
+            blockUpsampleData[sample] = m_voice.processSample();
+        }
+        
+        // Filter upsampled signal.
+        for (int filter = 0; filter < Variables::numResampleFilters; ++filter)
+        {
+            m_filters[filter]->processSamples (blockUpsampleData, blockUpsample.getNumSamples());
+        }
+        
+        // Downsample signal and apply envelope.
         for (int sample = 0; sample < block.getNumSamples(); ++sample)
         {
-            blockData[sample] = m_voice.processSample() * m_adsr.getNextSample();
+            blockData[sample] = blockUpsampleData[sample * Variables::resampleCoefficient] * m_adsr.getNextSample();
         }
+        
+        // Reset to original sample rate.
+        m_voice.setSampleRate (m_voice.getSampleRate() / static_cast<float> (Variables::resampleCoefficient));
         
         if (m_velocity != 1.f)
         {
-            // TODO:
-            // sort this...
-            
-            
-            //block.applyGain (m_velocity);
+            block.applyGain (m_velocity);
         }
         
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)

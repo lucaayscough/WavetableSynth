@@ -15,7 +15,7 @@ WavetableOscillator::WavetableOscillator()
     // Generate sine, triangle, sawtooth and square waves.
     for (int i = 0; i < m_wavetableLength; ++i)
     {
-        float phase = static_cast<float> (i) / m_wavetableLength;
+        float phase = static_cast<float> (i) / static_cast<float> (m_wavetableLength);
         
         sine.add (std::sinf (2.f * M_PI * phase));
         triangle.add (2.0f * std::fabs (2.0f * (phase - std::floor (phase + 0.5f))) - 1.0f);
@@ -35,7 +35,6 @@ WavetableOscillator::WavetableOscillator()
     for (int frame = 0; frame < m_numFrames; ++frame)
     {
         float weight = static_cast<float> (frame % 86) / static_cast<float> (86);
-        DBG (weight);
         
         for (int sample = 0; sample < m_wavetableLength; ++sample)
         {
@@ -63,13 +62,7 @@ float WavetableOscillator::getSampleRate()                              { return
 float WavetableOscillator::getFrequency()                               { return m_frequency; }
 
 void WavetableOscillator::setSampleRate (float sampleRate)              { m_sampleRate = sampleRate; }
-
-void WavetableOscillator::setFrequency (float frequency)
-{
-    m_frequency = frequency;
-    updateIndexIncrement();
-}
-
+void WavetableOscillator::setFrequency (float frequency)                { m_frequency = frequency; }
 void WavetableOscillator::setIndex (float index)                        { m_index = index; }
 void WavetableOscillator::setFrame (float frame)                        { m_frame = frame; }
 
@@ -80,9 +73,9 @@ void WavetableOscillator::updateIndexIncrement()
 
 float WavetableOscillator::interpolateLinearly()
 {
-    const auto truncatedIndex = static_cast<int> (m_index);
-    const auto nextIndex = static_cast<int> (std::ceil (m_index)) % m_wavetableLength;
-    const auto nextIndexWeight = m_index - static_cast<float> (truncatedIndex);
+    auto truncatedIndex = static_cast<int> (m_index);
+    auto nextIndex = static_cast<int> (std::ceil (m_index)) % m_wavetableLength;
+    auto nextIndexWeight = m_index - static_cast<float> (truncatedIndex);
     return m_wavetable[nextIndex][m_frame] * nextIndexWeight + (1.f - nextIndexWeight) * m_wavetable[truncatedIndex][m_frame];
 }
 
@@ -93,9 +86,12 @@ void WavetableOscillator::prepareToPlay (float sampleRate)
 
 float WavetableOscillator::processSample()
 {
+    updateIndexIncrement();
+    
+    // Get sample value.
     m_index = std::fmod (m_index, static_cast<float> (m_wavetableLength));
-    //auto sample = m_wavetable[static_cast<int> (m_index)][static_cast<int> (m_frame)];
-    const auto sample = interpolateLinearly();
+    auto sample = interpolateLinearly();
     m_index += m_indexIncrement;
+    
     return sample;
 }
