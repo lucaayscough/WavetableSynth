@@ -189,23 +189,18 @@ void WavetableSynth::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiB
     
     buffer.clear();
     
-    // Wavetable.
+    // Smooth parameters.
     m_smoothWavetablePosition.setTargetValue (*m_wavetablePosition);
-    m_synthesiser.setWavetablePosition (m_smoothWavetablePosition.getNextValue());
-    
-    // ADSR.
     m_smoothAttack.setTargetValue (*m_attack);
     m_smoothDecay.setTargetValue (*m_decay);
     m_smoothSustain.setTargetValue (*m_sustain);
     m_smoothRelease.setTargetValue (*m_release);
     
-    for (int voice = 0; voice < m_numVoices; ++voice)
-    {
-        SynthesiserVoice* v = dynamic_cast<SynthesiserVoice*> (m_synthesiser.getVoice (voice));
-        v->setEnvelope (m_smoothAttack.getNextValue(), m_smoothDecay.getNextValue(), m_smoothSustain.getNextValue(), m_smoothRelease.getNextValue());
-        v->setNumActiveVoices (*m_numActiveVoices);
-        v->setDetune (*m_detune);
-    }
+    // Propagate parameters.
+    m_synthesiser.setWavetablePosition (m_smoothWavetablePosition.getNextValue());
+    m_synthesiser.setEnvelope (m_smoothAttack.getNextValue(), m_smoothDecay.getNextValue(), m_smoothSustain.getNextValue(), m_smoothRelease.getNextValue());
+    m_synthesiser.setNumActiveVoices (*m_numActiveVoices);
+    m_synthesiser.setDetune (*m_detune);
     
     // Render audio.
     m_synthesiser.renderNextBlock (buffer, midiMessages, 0, buffer.getNumSamples());

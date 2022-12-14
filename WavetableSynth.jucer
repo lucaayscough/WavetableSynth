@@ -14,8 +14,6 @@
             file="Source/PluginProcessor.h"/>
       <FILE id="kFguPk" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="RTJb1t" name="Panner.cpp" compile="1" resource="0" file="Source/Panner.cpp"/>
-      <FILE id="bzkeNL" name="Panner.h" compile="0" resource="0" file="Source/Panner.h"/>
       <FILE id="FWcf0Z" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="SVPByL" name="Headers.h" compile="0" resource="0" file="Source/Headers.h"/>
       <FILE id="A4JMLo" name="Oscillator.cpp" compile="1" resource="0" file="Source/Oscillator.cpp"/>

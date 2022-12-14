@@ -166,6 +166,7 @@ void SynthesiserVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, 
     {
         juce::AudioBuffer<float> block (1, numSamples);
         juce::AudioBuffer<float> blockUpsample (1, numSamples * static_cast<float> (Variables::resampleCoefficient));
+        
         block.clear();
         blockUpsample.clear();
         
