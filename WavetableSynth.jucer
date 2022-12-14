@@ -16,8 +16,6 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="FWcf0Z" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="SVPByL" name="Headers.h" compile="0" resource="0" file="Source/Headers.h"/>
-      <FILE id="A4JMLo" name="Oscillator.cpp" compile="1" resource="0" file="Source/Oscillator.cpp"/>
-      <FILE id="pi7HXG" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
       <FILE id="Es6gBn" name="WavetableOscillator.cpp" compile="1" resource="0"
             file="Source/WavetableOscillator.cpp"/>
       <FILE id="m1nhQx" name="WavetableOscillator.h" compile="0" resource="0"
