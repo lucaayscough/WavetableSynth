@@ -32,6 +32,8 @@ WavetableOscillator::WavetableOscillator()
         }
     }
     
+    
+    // Interpolate between each wave and store in the table.
     for (int frame = 0; frame < m_numFrames; ++frame)
     {
         float weight = static_cast<float> (frame % 86) / static_cast<float> (86);
